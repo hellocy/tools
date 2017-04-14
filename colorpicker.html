@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>tools-colorPicker</title>
+        <style>
+            .box{
+                width: 1000px;
+                height:500px;
+                border:1px solid #ccc;
+                padding:20px;
+                margin:100px auto;
+            }
+            .R, .G, .B{
+                width:100%;
+                height: 50px;
+                margin-top: 30px;
+            }
+            .bar{
+                position: relative;
+                width:100%;
+                height: 7px;
+                border:1px solid #ccc;
+                border-radius: 10px;
+                box-shadow: inset 0 0 2px 2px rgba(0,0,0,0.3);
+            } 
+            .boll{
+                width:20px;
+                height:20px;
+                border-radius: 50%;
+                background:rgba(0,0,0,1);
+                position: absolute;
+                left: 0;
+                top:-7px;
+                color: #fff;
+                text-align: center;
+                line-height: 20px;
+                cursor: pointer
+            }
+            .number{
+                display:inline-block;
+                position: absolute;
+                top:-20px;
+                left:-10px;
+                width:40px;
+                height:15px;
+                color: #000;
+            }
+
+            .panel{
+                width: 100%;
+                height:100px;
+                margin: auto;
+                background:rgb(0, 0, 0);
+            }
+
+            .result{
+                font-size:20px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="wrapper">
+            <h1>颜色选择工具</h1>
+            <div class="box">
+                <div class="R">
+                    <div class="bar">
+                        <div class="boll" data-flag="r">
+                            R
+                            <span class="number">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="G">
+                    <div class="bar">
+                        <div class="boll" data-flag="g">
+                            G                        
+                            <span class="number">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="B">
+                    <div class="bar">
+                        <div class="boll" data-flag="b">
+                            B
+                            <span class="number">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel"></div>
+
+                <p class="result rgb">
+                    
+                </p>
+                <p class="result hex">
+                    
+                </p>
+            </div>
+        </div>
+        
+        <script src="js/lib/jquery-1.11.0.min.js" type="text/javascript"></script>
+        <script>
+
+            var reg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+            /*RGB颜色转换为16进制*/
+            String.prototype.colorHex = function(){
+                var that = this;
+                if(/^(rgb|RGB)/.test(that)){
+                    var aColor = that.replace(/(?:\(|\)|rgb|RGB)*/g,"").split(",");
+                    var strHex = "#";
+                    for(var i=0; i<aColor.length; i++){
+                        var hex = Number(aColor[i]).toString(16);
+                        if(hex === "0"){
+                            hex += hex; 
+                        }
+                        strHex += hex;
+                    }
+                    if(strHex.length !== 7){
+                        strHex = that;  
+                    }
+                    return strHex;
+                }else if(reg.test(that)){
+                    var aNum = that.replace(/#/,"").split("");
+                    if(aNum.length === 6){
+                        return that;    
+                    }else if(aNum.length === 3){
+                        var numHex = "#";
+                        for(var i=0; i<aNum.length; i+=1){
+                            numHex += (aNum[i]+aNum[i]);
+                        }
+                        return numHex;
+                    }
+                }else{
+                    return that;    
+                }
+            };
+
+            $(function() {
+                var r = 0, g = 0, b = 0;
+                $(".boll").mousedown(function(e){
+                    e.preventDefault();
+                    var $this = $(this);
+                    var ix = e.clientX;
+                    var tx = parseInt($this.offset().left);
+                    var $bar = $this.parent();
+                    var min = parseInt($bar.offset().left);
+                    var max = parseInt(min + $bar.width()) - 20;
+                    document.onmousemove = function(e){
+                        e.preventDefault();
+                        var mx = e.clientX;
+                        var dx = mx - ix;
+                        $this.offset({
+                            left: Math.min(Math.max(tx + dx, min), max)
+                        })
+                        var percent =  Math.min(Math.max((mx - min) * 100 / $bar.width(), 0), 100);
+                        $this.find(".number").text(percent + " %");
+                        var flag = $this.data("flag");
+                        show(flag, parseInt(percent * 2.55));
+                    }
+                    document.onmouseup = function(){
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    }
+                })
+
+                function show(flag, p){
+                    if(flag == "r"){
+                        r = p;
+                    }else if(flag == "g"){
+                        g = p;
+                    }else{
+                        b = p;
+                    }
+                    var rgb = "rgb("+r+", "+g+", "+b+")";
+                    var hex = rgb.colorHex();
+                    $(".panel").css("background", "rgb("+r+", "+g+", "+b+")");
+                    $(".rgb").text(rgb);
+                    $(".hex").text(hex);
+                }
+            })
+
+             
+        </script>
+    </body>
+</html>
+
+
+
