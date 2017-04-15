@@ -158,7 +158,7 @@
                         var percent =  Math.min(Math.max((mx - min) * 100 / $bar.width(), 0), 100);
                         $this.find(".number").text(percent + " %");
                         var flag = $this.data("flag");
-                        show(flag, parseInt(percent * 2.55));
+                        show(flag, Math.round(percent * 2.55));
                     }
                     document.onmouseup = function(){
                         document.onmousemove = null;
