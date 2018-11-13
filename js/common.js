@@ -664,3 +664,19 @@ function base64decode(str) {
     }
     return out;
 }
+
+function draw(x, y, m,n,z){
+    function step(t){
+        x += 0.1;
+        y = Math.sinh(x) * n + z;
+        var point = document.createElement('div');
+        point.style.left = m*x + 'px';
+        point.style.top = y + 'px';
+        point.setAttribute('class', 'point');
+        document.body.appendChild(point);
+
+        window.requestAnimationFrame(step);
+    }
+
+    window.requestAnimationFrame(step);
+}
